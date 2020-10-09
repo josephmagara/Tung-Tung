@@ -1,6 +1,8 @@
 package com.example.tungtung.presentation.camera
 
 import android.os.Bundle
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.camera_view.*
 import timber.log.Timber
+
 
 @AndroidEntryPoint
 class CameraActivity : AppCompatActivity() {
@@ -30,6 +33,21 @@ class CameraActivity : AppCompatActivity() {
 
         cameraViewModel.rotateCamera().observe(this, {
             startCamera(it)
+        })
+
+        cameraViewModel.rotateButtonOpacity().observe(this, {
+            val opacityTransition: Animation = AnimationUtils.loadAnimation(applicationContext, it.transitionId)
+            opacityTransition.setAnimationListener(object : Animation.AnimationListener{
+                override fun onAnimationStart(p0: Animation?) {}
+
+                override fun onAnimationEnd(p0: Animation?) {
+                    rotate_camera_button.background.alpha = it.endOpacity
+                }
+
+                override fun onAnimationRepeat(p0: Animation?) {}
+
+            })
+            rotate_camera_button.startAnimation(opacityTransition)
         })
 
         cameraViewModel.onPermissionNotGranted().observe(this, {
