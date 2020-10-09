@@ -14,8 +14,6 @@ import com.example.tungtung.presentation.camera.model.ViewOpacityTransition.Comp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 /**
  * Created by josephmagara on 9/10/20.
@@ -24,7 +22,9 @@ import java.util.concurrent.Executors
 class CameraViewModel @ViewModelInject constructor(private val permissionsHelper: PermissionsHelper) :
     ViewModel() {
 
-    private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    companion object {
+        private const val BUTTON_FADE_DELAY = 4000L
+    }
 
     private val rotateCamera = MutableLiveData<CameraSelector>()
     private val openCamera = MutableLiveData<CameraSelector>()
@@ -37,20 +37,15 @@ class CameraViewModel @ViewModelInject constructor(private val permissionsHelper
     private val fadeOutTransition = ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
 
     init {
+        buttonFadeJob = viewModelScope.launch {
+            delay(BUTTON_FADE_DELAY)
+            rotateButtonOpacityTransition.value = getTransition(false)
+        }
         ensureAllCameraPermissionsAreGranted()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        cameraExecutor.shutdown()
     }
 
     fun permissionRequestCompleted() {
         if (permissionsHelper.allCameraPermissionsGranted()) {
-            buttonFadeJob = viewModelScope.launch {
-                delay(5000)
-                rotateButtonOpacityTransition.value = getTransition(false)
-            }
             openCamera.value = currentCameraSelector
         } else {
             permissionsNotGranted.value = true
@@ -81,7 +76,6 @@ class CameraViewModel @ViewModelInject constructor(private val permissionsHelper
             permissionsHelper.requestCameraPermissions()
         } else {
             openCamera.value = currentCameraSelector
-            rotateButtonOpacityTransition.value = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
         }
     }
 
@@ -90,7 +84,7 @@ class CameraViewModel @ViewModelInject constructor(private val permissionsHelper
 
         buttonFadeJob?.cancel()
         buttonFadeJob = viewModelScope.launch {
-            delay(5000)
+            delay(BUTTON_FADE_DELAY)
             rotateButtonOpacityTransition.value = getTransition(false)
         }
     }
