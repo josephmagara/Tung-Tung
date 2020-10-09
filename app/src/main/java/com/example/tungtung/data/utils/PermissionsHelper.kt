@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import javax.inject.Inject
 
 /**
  * Created by josephmagara on 9/10/20.
  */
-class PermissionsHelper(private val context: Context) {
+class PermissionsHelper @Inject constructor(private val context: Context) {
 
     private val requiredCameraPermissions = arrayOf(Manifest.permission.CAMERA)
 

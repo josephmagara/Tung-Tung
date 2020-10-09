@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tungtung.R
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CameraActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class CameraActivity : AppCompatActivity() {
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 
+    @Inject
     lateinit var cameraViewModel: CameraViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

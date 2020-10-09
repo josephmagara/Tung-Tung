@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.example.tungtung.data.utils.PermissionsHelper
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 /**
  * Created by josephmagara on 9/10/20.
  */
 
-class CameraViewModel(private val permissionsHelper: PermissionsHelper) : ViewModel() {
+class CameraViewModel @Inject constructor(private val permissionsHelper: PermissionsHelper) :
+    ViewModel() {
 
     private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
