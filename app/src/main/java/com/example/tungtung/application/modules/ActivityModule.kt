@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import javax.inject.Singleton
 
 /**
  * Created by josephmagara on 9/10/20.
@@ -13,6 +14,7 @@ import dagger.hilt.android.components.ApplicationComponent
 @Module
 @InstallIn(ApplicationComponent::class)
 object ActivityModule {
+    @Singleton
 
     @Provides
     fun providesApplicationContext(application: Application): Context = application

@@ -2,20 +2,17 @@ package com.example.tungtung.presentation.camera
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tungtung.R
+import com.example.tungtung.data.utils.PermissionsHelper.Companion.REQUEST_CODE_PERMISSIONS
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CameraActivity : AppCompatActivity() {
 
-    companion object {
-        private const val REQUEST_CODE_PERMISSIONS = 10
-    }
-
-    @Inject
-    lateinit var cameraViewModel: CameraViewModel
+    private val cameraViewModel by viewModels<CameraViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
