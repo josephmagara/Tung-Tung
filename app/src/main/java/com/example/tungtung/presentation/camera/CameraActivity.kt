@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import com.example.tungtung.R
 import com.example.tungtung.data.utils.PermissionsHelper.Companion.REQUEST_CODE_PERMISSIONS
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.camera_view.*
 import timber.log.Timber
 
@@ -24,13 +25,21 @@ class CameraActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         cameraViewModel.openCamera().observe(this, {
-            startCamera()
+            startCamera(it)
+        })
+
+        cameraViewModel.rotateCamera().observe(this, {
+            startCamera(it)
         })
 
         cameraViewModel.onPermissionNotGranted().observe(this, {
             Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             finish()
         })
+
+        rotate_camera_button.setOnClickListener {
+            cameraViewModel.onRotateCameraClicked()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -42,7 +51,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun startCamera() {
+    private fun startCamera(cameraSelector: CameraSelector) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
@@ -55,9 +64,6 @@ class CameraActivity : AppCompatActivity() {
                 .also {
                     it.setSurfaceProvider(camera_view.surfaceProvider)
                 }
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 // Unbind use cases before rebinding

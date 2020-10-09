@@ -1,5 +1,6 @@
 package com.example.tungtung.presentation.camera
 
+import androidx.camera.core.CameraSelector
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,8 +18,10 @@ class CameraViewModel @ViewModelInject constructor(private val permissionsHelper
 
     private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
-    private val openCamera = MutableLiveData<Any>()
+    private val rotateCamera = MutableLiveData<CameraSelector>()
+    private val openCamera = MutableLiveData<CameraSelector>()
     private val permissionsNotGranted: MutableLiveData<Any> = MutableLiveData<Any>()
+    private var currentCameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
     init {
         ensureAllCameraPermissionsAreGranted()
@@ -31,21 +34,33 @@ class CameraViewModel @ViewModelInject constructor(private val permissionsHelper
 
     fun permissionRequestCompleted() {
         if (permissionsHelper.allCameraPermissionsGranted()) {
-            openCamera.value = true
+            openCamera.value = currentCameraSelector
         } else {
             permissionsNotGranted.value = true
         }
     }
 
-    fun openCamera(): LiveData<Any> = openCamera
+    fun onRotateCameraClicked(){
+        currentCameraSelector = if (currentCameraSelector == CameraSelector.DEFAULT_BACK_CAMERA){
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        } else {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        }
+        rotateCamera.value = currentCameraSelector
+    }
+
+    fun openCamera(): LiveData<CameraSelector> = openCamera
+
+    fun rotateCamera(): LiveData<CameraSelector> = rotateCamera
 
     fun onPermissionNotGranted(): LiveData<Any> = permissionsNotGranted
+
 
     private fun ensureAllCameraPermissionsAreGranted() {
         if (!permissionsHelper.allCameraPermissionsGranted()) {
             permissionsHelper.requestCameraPermissions()
         } else {
-            openCamera.value = true
+            openCamera.value = currentCameraSelector
         }
     }
 }
