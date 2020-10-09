@@ -62,6 +62,9 @@ dependencies {
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
     testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
     kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    // Hilt Jetpack Integrations
+    kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
 
     // Android KTX

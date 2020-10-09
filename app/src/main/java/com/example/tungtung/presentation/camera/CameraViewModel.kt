@@ -12,8 +12,7 @@ import java.util.concurrent.Executors
  * Created by josephmagara on 9/10/20.
  */
 
-class CameraViewModel @ViewModelInject constructor(private val permissionsHelper: PermissionsHelper) :
-    ViewModel() {
+class CameraViewModel @ViewModelInject constructor(private val permissionsHelper: PermissionsHelper) : ViewModel() {
 
     private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
