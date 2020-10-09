@@ -1,9 +1,10 @@
-package com.example.tungtung
+package com.example.tungtung.presentation.camera
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.tungtung.R
 
-class MainActivity : AppCompatActivity() {
+class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
