@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tungtung.R
 import com.example.tungtung.data.utils.CameraHelper
 import com.example.tungtung.data.utils.PermissionsHelper
+import com.example.tungtung.domain.camera.AnalyseImageUseCase
 import com.example.tungtung.presentation.camera.model.CameraConfig
 import com.example.tungtung.presentation.camera.model.ViewOpacityTransition
 import com.example.tungtung.presentation.camera.model.ViewOpacityTransition.Companion.FULL_OPACITY
@@ -24,8 +25,9 @@ import kotlinx.coroutines.launch
  */
 
 class CameraViewModel @ViewModelInject constructor(
+    cameraHelper: CameraHelper,
     private val permissionsHelper: PermissionsHelper,
-    private val cameraHelper: CameraHelper
+    private val analyseImageUseCase: AnalyseImageUseCase
 ) : ViewModel() {
 
     companion object {
@@ -53,6 +55,7 @@ class CameraViewModel @ViewModelInject constructor(
             delay(BUTTON_FADE_DELAY)
             rotateButtonOpacityTransition.value = getTransition(false)
         }
+        setUpImageAnalyser()
         ensureAllCameraPermissionsAreGranted()
     }
 
@@ -84,9 +87,7 @@ class CameraViewModel @ViewModelInject constructor(
     fun rotateButtonOpacity(): LiveData<ViewOpacityTransition> = rotateButtonOpacityTransition
 
     private fun setUpImageAnalyser() {
-        imageAnalysis.setAnalyzer(executor, {
-
-        })
+        imageAnalysis.setAnalyzer(executor, { analyseImageUseCase.analyse(it) })
     }
 
     private fun ensureAllCameraPermissionsAreGranted() {
