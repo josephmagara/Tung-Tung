@@ -75,4 +75,7 @@ dependencies {
 
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // Google Vision
+    implementation 'com.google.mlkit:face-detection:16.0.2'
 }
