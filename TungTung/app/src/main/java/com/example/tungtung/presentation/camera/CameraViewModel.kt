@@ -45,17 +45,18 @@ class CameraViewModel @ViewModelInject constructor(
     private val fadeInTransition = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
     private val fadeOutTransition = ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
     private val executor = cameraHelper.getCameraExecutor()
-    private val imageAnalysis = ImageAnalysis.Builder()
-        .setTargetResolution(Size(1280, 720))
-        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        .build()
+    private val imageAnalysis by lazy {
+        ImageAnalysis.Builder()
+            .setTargetResolution(Size(1280, 720))
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+    }
 
     init {
         buttonFadeJob = viewModelScope.launch {
             delay(BUTTON_FADE_DELAY)
             rotateButtonOpacityTransition.value = getTransition(false)
         }
-        setUpImageAnalyser()
         ensureAllCameraPermissionsAreGranted()
     }
 
@@ -95,6 +96,7 @@ class CameraViewModel @ViewModelInject constructor(
             permissionsHelper.requestCameraPermissions()
         } else {
             openCamera.value = CameraConfig(currentCameraSelector, imageAnalysis, executor)
+            setUpImageAnalyser()
         }
     }
 

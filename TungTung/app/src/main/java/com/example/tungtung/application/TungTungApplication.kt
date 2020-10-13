@@ -3,6 +3,8 @@ package com.example.tungtung.application
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -10,7 +12,11 @@ import dagger.hilt.android.HiltAndroidApp
  */
 
 @HiltAndroidApp
-class TungTungApplication : Application() {
+class TungTungApplication : Application(), CameraXConfig.Provider {
+
+    override fun getCameraXConfig(): CameraXConfig {
+        return Camera2Config.defaultConfig()
+    }
 
     private var currentActivity: Activity? = null
 
