@@ -1,7 +1,6 @@
 package com.example.tungtung.presentation.camera.model
 
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
 import java.util.concurrent.Executor
 
 /**
@@ -9,6 +8,5 @@ import java.util.concurrent.Executor
  */
 data class CameraConfig(
     val selector: CameraSelector,
-    val imageAnalysis: ImageAnalysis,
     val executor: Executor
 )

@@ -62,7 +62,7 @@ class CameraViewModel @ViewModelInject constructor(
 
     fun permissionRequestCompleted() {
         if (permissionsHelper.allCameraPermissionsGranted()) {
-            openCamera.value = CameraConfig(currentCameraSelector, imageAnalysis, executor)
+            openCamera.value = CameraConfig(currentCameraSelector, executor)
         } else {
             permissionsNotGranted.value = true
         }
@@ -76,7 +76,7 @@ class CameraViewModel @ViewModelInject constructor(
             CameraSelector.DEFAULT_BACK_CAMERA
         }
         updateRotateButtonOpacity()
-        rotateCamera.value = CameraConfig(currentCameraSelector, imageAnalysis, executor)
+        rotateCamera.value = CameraConfig(currentCameraSelector, executor)
     }
 
     fun openCamera(): LiveData<CameraConfig> = openCamera
@@ -87,6 +87,11 @@ class CameraViewModel @ViewModelInject constructor(
 
     fun rotateButtonOpacity(): LiveData<ViewOpacityTransition> = rotateButtonOpacityTransition
 
+    fun getImageAnalyser(): ImageAnalysis {
+        setUpImageAnalyser()
+        return imageAnalysis
+    }
+
     private fun setUpImageAnalyser() {
         imageAnalysis.setAnalyzer(executor, { analyseImageUseCase.analyse(it) })
     }
@@ -95,8 +100,7 @@ class CameraViewModel @ViewModelInject constructor(
         if (!permissionsHelper.allCameraPermissionsGranted()) {
             permissionsHelper.requestCameraPermissions()
         } else {
-            openCamera.value = CameraConfig(currentCameraSelector, imageAnalysis, executor)
-            setUpImageAnalyser()
+            openCamera.value = CameraConfig(currentCameraSelector, executor)
         }
     }
 

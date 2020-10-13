@@ -90,7 +90,7 @@ class CameraActivity : AppCompatActivity() {
                     cameraProvider.unbindAll()
 
                     // Bind use cases to camera
-                    cameraProvider.bindToLifecycle(owner, selector, imageAnalysis, preview)
+                    cameraProvider.bindToLifecycle(owner, selector, cameraViewModel.getImageAnalyser(), preview)
 
                 } catch (exc: Exception) {
                     Timber.e("Use case binding failed: + $exc")
