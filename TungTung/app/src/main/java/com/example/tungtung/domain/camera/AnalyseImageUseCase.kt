@@ -21,10 +21,12 @@ class AnalyseImageUseCase @Inject constructor(){
             faceDetector.process(image)
                 .addOnSuccessListener { faces ->
                     faces.forEach { face ->
+                        Timber.v("Face information $face")
                         face.smilingProbability?.let {
                             FaceData(it)
                             Timber.v("Percentage of smile: $it")
                         }
+                        imageProxy.close()
                     }
                 }.addOnFailureListener { exception ->
                     Timber.e(exception)
