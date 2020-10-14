@@ -5,7 +5,11 @@ import android.app.Application
 import android.os.Bundle
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
+import com.example.tungtung.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+
 
 /**
  * Created by josephmagara on 9/10/20.
@@ -22,6 +26,10 @@ class TungTungApplication : Application(), CameraXConfig.Provider {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
         setupActivityListener()
     }
 
