@@ -1,17 +1,19 @@
 package com.example.tungtung.presentation.camera
 
 import android.os.Bundle
+import android.util.Size
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.example.tungtung.R
 import com.example.tungtung.data.utils.PermissionsHelper.Companion.REQUEST_CODE_PERMISSIONS
+import com.example.tungtung.presentation.camera.model.CameraConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.camera_view.*
@@ -36,8 +38,9 @@ class CameraActivity : AppCompatActivity() {
         })
 
         cameraViewModel.rotateButtonOpacity().observe(this, {
-            val opacityTransition: Animation = AnimationUtils.loadAnimation(applicationContext, it.transitionId)
-            opacityTransition.setAnimationListener(object : Animation.AnimationListener{
+            val opacityTransition: Animation =
+                AnimationUtils.loadAnimation(applicationContext, it.transitionId)
+            opacityTransition.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(p0: Animation?) {}
 
                 override fun onAnimationEnd(p0: Animation?) {
@@ -69,31 +72,41 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun startCamera(cameraSelector: CameraSelector) {
+    private fun startCamera(cameraConfig: CameraConfig) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        val owner: LifecycleOwner = this
+        with(cameraConfig) {
+            cameraProviderFuture.addListener({
+                // Used to bind the lifecycle of cameras to the lifecycle owner
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-        cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                // Preview
+                val preview = Preview.Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(camera_view.surfaceProvider)
+                    }
 
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(camera_view.surfaceProvider)
+                try {
+                    // Unbind use cases before rebinding
+                    cameraProvider.unbindAll()
+
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setTargetResolution(Size(1280, 720))
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+
+                    imageAnalysis.setAnalyzer(executor, { image ->
+                        cameraViewModel.onNewImage(image)
+                    })
+                    // Bind use cases to camera
+                    cameraProvider.bindToLifecycle(owner, selector, imageAnalysis, preview)
+
+                } catch (exc: Exception) {
+                    Timber.e("Use case binding failed: + $exc")
                 }
 
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview)
-
-            } catch (exc: Exception) {
-                Timber.e("Use case binding failed: + $exc")
-            }
-
-        }, ContextCompat.getMainExecutor(this))
+            }, executor)
+        }
     }
 }

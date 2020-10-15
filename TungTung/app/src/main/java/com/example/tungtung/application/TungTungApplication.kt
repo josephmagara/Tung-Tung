@@ -3,19 +3,33 @@ package com.example.tungtung.application
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
+import com.example.tungtung.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+
 
 /**
  * Created by josephmagara on 9/10/20.
  */
 
 @HiltAndroidApp
-class TungTungApplication : Application() {
+class TungTungApplication : Application(), CameraXConfig.Provider {
+
+    override fun getCameraXConfig(): CameraXConfig {
+        return Camera2Config.defaultConfig()
+    }
 
     private var currentActivity: Activity? = null
 
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
         setupActivityListener()
     }
 
