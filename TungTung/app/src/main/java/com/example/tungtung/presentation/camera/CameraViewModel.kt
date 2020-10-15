@@ -1,8 +1,7 @@
 package com.example.tungtung.presentation.camera
 
-import android.util.Size
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -45,12 +44,6 @@ class CameraViewModel @ViewModelInject constructor(
     private val fadeInTransition = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
     private val fadeOutTransition = ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
     private val executor = cameraHelper.getCameraExecutor()
-    private val imageAnalysis by lazy {
-        ImageAnalysis.Builder()
-            .setTargetResolution(Size(1280, 720))
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .build()
-    }
 
     init {
         buttonFadeJob = viewModelScope.launch {
@@ -87,14 +80,7 @@ class CameraViewModel @ViewModelInject constructor(
 
     fun rotateButtonOpacity(): LiveData<ViewOpacityTransition> = rotateButtonOpacityTransition
 
-    fun getImageAnalyser(): ImageAnalysis {
-        setUpImageAnalyser()
-        return imageAnalysis
-    }
-
-    private fun setUpImageAnalyser() {
-        imageAnalysis.setAnalyzer(executor, { analyseImageUseCase.analyse(it) })
-    }
+    fun onNewImage(imageProxy: ImageProxy) = analyseImageUseCase.analyse(imageProxy)
 
     private fun ensureAllCameraPermissionsAreGranted() {
         if (!permissionsHelper.allCameraPermissionsGranted()) {

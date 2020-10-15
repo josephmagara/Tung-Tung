@@ -1,11 +1,13 @@
 package com.example.tungtung.presentation.camera
 
 import android.os.Bundle
+import android.util.Size
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.lifecycle.LifecycleOwner
@@ -89,8 +91,16 @@ class CameraActivity : AppCompatActivity() {
                     // Unbind use cases before rebinding
                     cameraProvider.unbindAll()
 
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setTargetResolution(Size(1280, 720))
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+
+                    imageAnalysis.setAnalyzer(executor, { image ->
+                        cameraViewModel.onNewImage(image)
+                    })
                     // Bind use cases to camera
-                    cameraProvider.bindToLifecycle(owner, selector, cameraViewModel.getImageAnalyser(), preview)
+                    cameraProvider.bindToLifecycle(owner, selector, imageAnalysis, preview)
 
                 } catch (exc: Exception) {
                     Timber.e("Use case binding failed: + $exc")
