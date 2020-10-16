@@ -32,7 +32,14 @@ class CameraViewModel @ViewModelInject constructor(
 
     companion object {
         private const val BUTTON_FADE_DELAY = 4000L
+        private val fadeInTransition = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
+        private val fadeOutTransition =
+            ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
     }
+
+    private var buttonFadeJob: Job? = null
+    private val executor = cameraHelper.getCameraExecutor()
+    private var currentCameraSelector: CameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
     private val rotateCamera = MutableLiveData<CameraConfig>()
     private val openCamera = MutableLiveData<CameraConfig>()
@@ -40,14 +47,6 @@ class CameraViewModel @ViewModelInject constructor(
         MutableLiveData<ViewOpacityTransition>()
     private val permissionsNotGranted: MutableLiveData<Any> = MutableLiveData<Any>()
     private val countDownTimer: MutableLiveData<Int> = MutableLiveData<Int>()
-
-
-    private var buttonFadeJob: Job? = null
-    private var currentCameraSelector: CameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-    private val fadeInTransition = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
-    private val fadeOutTransition =
-        ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
-    private val executor = cameraHelper.getCameraExecutor()
 
     init {
         buttonFadeJob = viewModelScope.launch {
