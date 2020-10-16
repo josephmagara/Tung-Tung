@@ -1,5 +1,6 @@
 package com.example.tungtung.presentation.camera
 
+import android.os.CountDownTimer
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageProxy
 import androidx.hilt.lifecycle.ViewModelInject
@@ -37,6 +38,7 @@ class CameraViewModel @ViewModelInject constructor(
     private val openCamera = MutableLiveData<CameraConfig>()
     private val rotateButtonOpacityTransition: MutableLiveData<ViewOpacityTransition> = MutableLiveData<ViewOpacityTransition>()
     private val permissionsNotGranted: MutableLiveData<Any> = MutableLiveData<Any>()
+    private val countDownTimer: MutableLiveData<String> = MutableLiveData<String>()
 
 
     private var buttonFadeJob: Job? = null
@@ -50,6 +52,7 @@ class CameraViewModel @ViewModelInject constructor(
             delay(BUTTON_FADE_DELAY)
             rotateButtonOpacityTransition.value = getTransition(false)
         }
+
         ensureAllCameraPermissionsAreGranted()
     }
 
@@ -80,6 +83,8 @@ class CameraViewModel @ViewModelInject constructor(
 
     fun rotateButtonOpacity(): LiveData<ViewOpacityTransition> = rotateButtonOpacityTransition
 
+    fun countDownTimer(): LiveData<String> = countDownTimer
+
     fun onNewImage(imageProxy: ImageProxy) = analyseImageUseCase.analyse(imageProxy)
 
     private fun ensureAllCameraPermissionsAreGranted() {
@@ -87,7 +92,19 @@ class CameraViewModel @ViewModelInject constructor(
             permissionsHelper.requestCameraPermissions()
         } else {
             openCamera.value = CameraConfig(currentCameraSelector, executor)
+            startCountDownTimer()
         }
+    }
+
+    private fun startCountDownTimer(){
+        val timer = object: CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = (millisUntilFinished / 1000) % 60
+                countDownTimer.value = "$seconds"
+            }
+            override fun onFinish() {}
+        }
+        timer.start()
     }
 
     private fun updateRotateButtonOpacity() {

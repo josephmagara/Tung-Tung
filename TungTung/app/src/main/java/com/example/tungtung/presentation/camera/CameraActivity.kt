@@ -53,6 +53,10 @@ class CameraActivity : AppCompatActivity() {
             rotate_camera_button.startAnimation(opacityTransition)
         })
 
+        cameraViewModel.countDownTimer().observe(this, {
+            count_down_ticker.text = it
+        })
+
         cameraViewModel.onPermissionNotGranted().observe(this, {
             Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             finish()
