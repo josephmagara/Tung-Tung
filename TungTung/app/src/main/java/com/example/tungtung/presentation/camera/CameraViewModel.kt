@@ -36,15 +36,17 @@ class CameraViewModel @ViewModelInject constructor(
 
     private val rotateCamera = MutableLiveData<CameraConfig>()
     private val openCamera = MutableLiveData<CameraConfig>()
-    private val rotateButtonOpacityTransition: MutableLiveData<ViewOpacityTransition> = MutableLiveData<ViewOpacityTransition>()
+    private val rotateButtonOpacityTransition: MutableLiveData<ViewOpacityTransition> =
+        MutableLiveData<ViewOpacityTransition>()
     private val permissionsNotGranted: MutableLiveData<Any> = MutableLiveData<Any>()
-    private val countDownTimer: MutableLiveData<String> = MutableLiveData<String>()
+    private val countDownTimer: MutableLiveData<Int> = MutableLiveData<Int>()
 
 
     private var buttonFadeJob: Job? = null
     private var currentCameraSelector: CameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
     private val fadeInTransition = ViewOpacityTransition(R.anim.camera_button_fade_in, FULL_OPACITY)
-    private val fadeOutTransition = ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
+    private val fadeOutTransition =
+        ViewOpacityTransition(R.anim.camera_button_fade_out, HALF_OPACITY)
     private val executor = cameraHelper.getCameraExecutor()
 
     init {
@@ -83,9 +85,19 @@ class CameraViewModel @ViewModelInject constructor(
 
     fun rotateButtonOpacity(): LiveData<ViewOpacityTransition> = rotateButtonOpacityTransition
 
-    fun countDownTimer(): LiveData<String> = countDownTimer
+    fun countDownTimer(): LiveData<Int> = countDownTimer
 
     fun onNewImage(imageProxy: ImageProxy) = analyseImageUseCase.analyse(imageProxy)
+
+    fun countDownTimerClicked() {
+        if (countDownTimer.value == 0) {
+            restartCountDownTimer()
+        }
+    }
+
+    private fun restartCountDownTimer() {
+        startCountDownTimer()
+    }
 
     private fun ensureAllCameraPermissionsAreGranted() {
         if (!permissionsHelper.allCameraPermissionsGranted()) {
@@ -96,12 +108,13 @@ class CameraViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun startCountDownTimer(){
-        val timer = object: CountDownTimer(30000, 1000) {
+    private fun startCountDownTimer() {
+        val timer = object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = (millisUntilFinished / 1000) % 60
-                countDownTimer.value = "$seconds"
+                countDownTimer.value = seconds.toInt()
             }
+
             override fun onFinish() {}
         }
         timer.start()

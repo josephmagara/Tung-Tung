@@ -54,7 +54,7 @@ class CameraActivity : AppCompatActivity() {
         })
 
         cameraViewModel.countDownTimer().observe(this, {
-            count_down_ticker.text = it
+            count_down_ticker.text = "$it"
         })
 
         cameraViewModel.onPermissionNotGranted().observe(this, {
@@ -64,6 +64,10 @@ class CameraActivity : AppCompatActivity() {
 
         rotate_camera_button.setOnClickListener {
             cameraViewModel.onRotateCameraClicked()
+        }
+
+        count_down_timer_view.setOnClickListener {
+            cameraViewModel.countDownTimerClicked()
         }
     }
 
